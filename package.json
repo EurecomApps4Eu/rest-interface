@@ -4,7 +4,7 @@
   "description": "-",
   "main": "index.js",
   "dependencies": {
-    "express": "~3.4.8"
+    "mers": "^0.7.3"
   },
   "devDependencies": {},
   "scripts": {
