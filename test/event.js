@@ -15,7 +15,6 @@ describe('REST', function(){
       text: 'test content',
     };
 
-
     it('should add new event', function(done) {
 
       request(uri)
@@ -63,6 +62,31 @@ describe('REST', function(){
           expect(res.body._id).to.equal(modifiedTestEvent._id);
           expect(res.body.title).to.equal(modifiedTestEvent.title);
           expect(res.body.text).to.equal(modifiedTestEvent.text);
+
+          done();
+
+        });
+
+    });
+
+    it ('should complain when adding non-existing fields', function(done) {
+
+      var modifiedTestEvent = extend(testEvent, {
+        title:'ModifiedTitle',
+        text: 'ModifiedText',
+        nonExistingField: 'test',
+      });
+
+      request(uri)
+        .post('/events')
+        .send(modifiedTestEvent)
+        .expect('Content-Type', /json/)
+        .expect(400) // HTTP 400 bad request
+        .end(function(err, res) {
+
+          if ( err ) {
+            throw err;
+          }
 
           done();
 
