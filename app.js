@@ -1,4 +1,5 @@
 var express = require('express');
+var cors = require('cors');
 var restful = require('node-restful');
 var mongoose = restful.mongoose;
 var app = express();
@@ -7,6 +8,9 @@ var config = require('./config');
 
 // Models
 var Event = require('./models/event');
+
+// Globally enable CORS
+app.use(cors());
 
 // Required by node-restful
 app.use(express.bodyParser());
