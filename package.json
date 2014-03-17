@@ -1,0 +1,23 @@
+{
+  "name": "Apps4Europe-Backend",
+  "version": "0.0.1",
+  "description": "-",
+  "main": "index.js",
+  "dependencies": {
+    "express": "~3.4.8"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/atroberg/apps4europe-backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/atroberg/apps4europe-backend/issues"
+  },
+  "homepage": "https://github.com/atroberg/apps4europe-backend"
+}
