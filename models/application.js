@@ -5,7 +5,7 @@ var applicationSchema = new mongoose.Schema({
 
     // Todo
     title: String,
-    shortTitle: String,
+    text: String,
 
 });
 

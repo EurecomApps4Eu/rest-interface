@@ -8,6 +8,7 @@ var config = require('./config');
 
 // Models
 var Event = require('./models/event');
+var Application = require('./models/application');
 
 // Globally enable CORS
 app.use(cors());
@@ -35,5 +36,6 @@ else {
 }
 
 Event.methods(['get', 'post', 'put', 'delete']).register(app, '/events');
+Application.methods(['get', 'post', 'put', 'delete']).register(app, '/applications');
 
 app.listen(process.argv[2]);
