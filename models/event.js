@@ -4,7 +4,7 @@ var Schema = mongoose.Schema;
 
 var eventSchema = new Schema({
 
-    // Defined in Apps4Europe vocavulary
+    // Defined in Apps4Europe vocabulary
     title: String,
     text: String,
     firstPrize: String,
@@ -23,6 +23,12 @@ var eventSchema = new Schema({
     startDate: Date,
     endDate: Date,
     location: String,
+
+    // Connect event to user account
+    owner: {
+      type: Schema.Types.ObjectId,
+      required: true,
+    }
 
 });
 

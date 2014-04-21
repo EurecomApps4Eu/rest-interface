@@ -1,3 +1,5 @@
+// Example config file: replace with real values for production use
+
 module.exports = {
   db: {
     productionDb: 'mongodb://localhost/apps4europe',
@@ -6,4 +8,5 @@ module.exports = {
   test: {
     restURI: 'http://localhost:3001',
   },
+  secret: "Iv~Fcpwdo-.g!77Ad60'}:2thx=+r*N*^dIFW]p",
 };
