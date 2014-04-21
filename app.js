@@ -6,6 +6,7 @@ var app = express();
 var crypto = require('crypto');
 
 var config = require('./config');
+var email = require('./email');
 
 // Models
 var Event = require('./models/event');
@@ -61,8 +62,32 @@ app.use(function(req, res, next) {
 });
 
 
+function afterSaveApplication(req, res, next) {
+
+  // Shall we send a notification e-mail to owner of connected event?
+  if ( !res.locals.bundle.published ) {
+    Event.findOne({_id: res.locals.bundle.connectedEvent}, function(error, event) {
+
+      if ( !event || !event.owner ) {
+        return;
+      }
+
+      User.findOne({_id: event.owner}, function(error, owner) {
+        if ( owner && owner.emailNotifications ) {
+          email.sendNotification(owner.email);
+        }
+      });
+
+    });
+  }
+
+  next();
+}
+
+
 Event.methods(['get', 'post', 'put', 'delete']).register(app, '/events');
-Application.methods(['get', 'post', 'put', 'delete']).register(app, '/applications');
+
+Application.methods(['get', {method: 'post', after: afterSaveApplication}, 'put', 'delete']).register(app, '/applications');
 
 // Pw hash for user registration and login
 function hash(password, salt) {
