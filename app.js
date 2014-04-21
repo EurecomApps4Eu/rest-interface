@@ -75,7 +75,7 @@ function beforeSaveUser(req, res, next) {
   // TODO: add additional check that user has permissions to edit this user account
 
   // Ensure that user is modifying only allowed fields
-  var allowedFields = ['email', 'password', '_id'];
+  var allowedFields = ['email', 'password', '_id', 'emailNotifications'];
   for ( key in req.body ) {
     if ( allowedFields.indexOf(key) === -1 ) {
       delete req.body[key];
@@ -141,10 +141,15 @@ app.post('/login', function(req, res) {
 });
 
 app.get('/users/:id', function(req, res) {
+
+  if ( req.params.id === 'me' ) {
+    req.params.id = req.body.owner;
+  }
+
   User.findOne({_id: req.params.id}, function(error, dbUser) {
     var user = {};
 
-    ['_id', 'email', 'settings'].forEach(function(key) {
+    ['_id', 'email', 'emailNotifications'].forEach(function(key) {
       user[key] = dbUser[key];
     });
 

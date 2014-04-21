@@ -23,10 +23,12 @@ var userSchema = new Schema({
     accessToken: {
       type: String,
       unique: true,
+      sparse: true,
     },
 
-    settings: {
-      emailNotifications: Boolean,
+    emailNotifications: {
+      type: Boolean,
+      default: true,
     },
 
 });
