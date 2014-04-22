@@ -14,7 +14,8 @@ var applicationSchema = new Schema({
       type: Schema.Types.ObjectId,
       ref: 'Event'
     },
-    published: Boolean
+    published: Boolean,
+    datasets: [String]
 
 });
 
