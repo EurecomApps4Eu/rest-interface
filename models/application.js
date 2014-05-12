@@ -19,7 +19,11 @@ var applicationSchema = new Schema({
       url: String,
       description: String
     }],
-    images: [String]
+    images: [String],
+    authors: [{
+      name: String,
+      email: String
+    }],
 
 });
 

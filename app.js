@@ -6,6 +6,7 @@ var app = express();
 var crypto = require('crypto');
 var fs = require('fs');
 var exphbs  = require('express3-handlebars');
+var extend = require('node.extend');
 
 var config = require('./config');
 var email = require('./email');
@@ -261,6 +262,30 @@ app.post('/images', function(req, res) {
   res.send(200, tmpPathParts[tmpPathParts.length - 1]);
 });
 
+function turtleEscapeSingle(value) {
+  if ( typeof value !== "string" ) {
+    return value;
+  }
+
+  value = value.replace(/"/g, '\\"');
+
+  return value;
+}
+
+function formatDate(dateObj) {
+  return dateObj.toISOString().substring(0, 10);
+}
+
+function turtleEscape(origEvent) {
+  var event = extend({}, origEvent);
+
+  for ( var key in event ) {
+    event[key] = turtleEscapeSingle(event[key]);
+  }
+
+  return event;
+}
+
 // RDF output
 app.get('/rdf/event/:id', function(req, res) {
 
@@ -272,7 +297,38 @@ app.get('/rdf/event/:id', function(req, res) {
     else {
       // Should we specify correct content type (won't open in browser anymore)?
       // res.setHeader('Content-Type', 'application/x-turtle; charset=utf-8');
+      event.rootUrl = config.restURI;
+
+      // Fix dates
+      event.startDateF = formatDate(event.startDate);
+      event.endDateF = formatDate(event.endDate);
+
+      // Need to escape all properties
+      event = turtleEscape(event);
+
       res.render('event', event);
+    }
+
+  });
+
+});
+
+app.get('/rdf/application/:id', function(req, res) {
+
+  Application.findOne({_id: req.params.id}, function(error, app) {
+
+    if ( error ) {
+      res.send(404);
+    }
+    else {
+      // Should we specify correct content type (won't open in browser anymore)?
+      // res.setHeader('Content-Type', 'application/x-turtle; charset=utf-8');
+      app.rootUrl = config.restURI;
+
+      // Need to escape all properties
+      app = turtleEscape(app);
+
+      res.render('application', app);
     }
 
   });
