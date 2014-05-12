@@ -23,6 +23,19 @@ var eventSchema = new Schema({
     startDate: Date,
     endDate: Date,
     location: String,
+    contacts: [{
+      name: String,
+      email: String,
+      phone: String
+    }],
+    organizers: [{
+      name: String,
+      url: String
+    }],
+    sponsors: [{
+      name: String,
+      url: String
+    }],
 
     // Connect event to user account
     owner: {
