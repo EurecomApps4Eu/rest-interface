@@ -4,6 +4,7 @@ var restful = require('node-restful');
 var mongoose = restful.mongoose;
 var app = express();
 var crypto = require('crypto');
+var fs = require('fs');
 
 var config = require('./config');
 var email = require('./email');
@@ -15,6 +16,17 @@ var User = require('./models/user');
 
 // Globally enable CORS
 app.use(cors());
+
+// Limit file upload (and http request) size
+app.configure(function() {
+  app.use(express.bodyParser({
+    limit: config.fileUploadLimit
+  }));
+});
+
+// Serve static files
+var oneDay = 86400000;
+app.use('/static', express.static(__dirname + '/static', {maxAge: oneDay}));
 
 // Required by node-restful
 app.use(express.bodyParser());
@@ -61,9 +73,18 @@ app.use(function(req, res, next) {
   }
 });
 
+function afterPostApplication(req, res, next) {
+  sendNotification(req, res);
+  handleImages(req, res);
+  next();
+}
 
-function afterSaveApplication(req, res, next) {
+function afterPutApplication(req, res, next) {
+  handleImages(req, res);
+  next();
+}
 
+function sendNotification(req, res) {
   // Shall we send a notification e-mail to owner of connected event?
   if ( !res.locals.bundle.published ) {
     Event.findOne({_id: res.locals.bundle.connectedEvent}, function(error, event) {
@@ -80,14 +101,55 @@ function afterSaveApplication(req, res, next) {
 
     });
   }
-
-  next();
 }
 
+function handleImages(req, res) {
+
+  var id = res.locals.bundle._id;
+
+  var cleanedImages = [];
+
+  req.body.images.forEach(function(image, key) {
+
+    if ( image.src ) {
+      cleanedImages.push(image.src);
+    }
+
+    // Image was just uploaded => move from tmp storage to permanent storage
+    else if ( image.tmpName ) {
+      var folder = __dirname + '/static/images/' + id;
+      var newPath = folder + '/' + image.name;
+
+      cleanedImages.push(config.restURI + '/static/images/' + id + '/' + image.name);
+
+      fs.readFile('/tmp/' + image.tmpName, function (err, data) {
+
+        // Ensure directory exists
+        if ( !fs.existsSync(folder) ) {
+          fs.mkdirSync(folder);
+        }
+
+        fs.writeFile(newPath, data, function(error) {
+          // TODO: check for error
+        });
+      });
+    }
+  });
+
+  Application.findOne({_id:id}, function(err, doc) {
+    doc.images = cleanedImages;
+    doc.save();
+  });
+}
 
 Event.methods(['get', 'post', 'put', 'delete']).register(app, '/events');
 
-Application.methods(['get', {method: 'post', after: afterSaveApplication}, 'put', 'delete']).register(app, '/applications');
+Application.methods([
+  'get',
+  {method: 'post', after: afterPostApplication},
+  {method: 'put', after: afterPutApplication},
+  'delete'
+]).register(app, '/applications');
 
 // Pw hash for user registration and login
 function hash(password, salt) {
@@ -174,12 +236,18 @@ app.get('/users/:id', function(req, res) {
   User.findOne({_id: req.params.id}, function(error, dbUser) {
     var user = {};
 
-    ['_id', 'email', 'emailNotifications'].forEach(function(key) {
+    ['_id', 'email', 'emailNotifications'].forEach(function(key) {I
       user[key] = dbUser[key];
     });
 
     res.json(user);
   });
+});
+
+// Photo upload
+app.post('/images', function(req, res) {
+  var tmpPathParts = req.files.file.path.split('/');
+  res.send(200, tmpPathParts[tmpPathParts.length - 1]);
 });
 
 app.listen(process.argv[2]);

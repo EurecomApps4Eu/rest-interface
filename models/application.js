@@ -15,7 +15,11 @@ var applicationSchema = new Schema({
       ref: 'Event'
     },
     published: Boolean,
-    datasets: [String]
+    datasets: [{
+      url: String,
+      description: String
+    }],
+    images: [String]
 
 });
 
