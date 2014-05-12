@@ -103,6 +103,13 @@ function sendNotification(req, res) {
   }
 }
 
+function validImageExtension(filename) {
+  var parts = filename.split('.');
+  var extension = parts[parts.length - 1].toLowerCase();
+
+  return ['jpg', 'jpeg', 'png', 'gif'].indexOf(extension) !== -1;
+}
+
 function handleImages(req, res) {
 
   var id = res.locals.bundle._id;
@@ -116,7 +123,7 @@ function handleImages(req, res) {
     }
 
     // Image was just uploaded => move from tmp storage to permanent storage
-    else if ( image.tmpName ) {
+    else if ( image.tmpName && validImageExtension(image.name) ) {
       var folder = __dirname + '/static/images/' + id;
       var newPath = folder + '/' + image.name;
 
