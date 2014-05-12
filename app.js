@@ -5,6 +5,7 @@ var mongoose = restful.mongoose;
 var app = express();
 var crypto = require('crypto');
 var fs = require('fs');
+var exphbs  = require('express3-handlebars');
 
 var config = require('./config');
 var email = require('./email');
@@ -31,6 +32,9 @@ app.use('/static', express.static(__dirname + '/static', {maxAge: oneDay}));
 // Required by node-restful
 app.use(express.bodyParser());
 app.use(express.query());
+
+app.engine('handlebars', exphbs({defaultLayout: 'main'}));
+app.set('view engine', 'handlebars');
 
 var testMode = process.argv.indexOf('--test') !== -1;
 var db;
@@ -255,6 +259,24 @@ app.get('/users/:id', function(req, res) {
 app.post('/images', function(req, res) {
   var tmpPathParts = req.files.file.path.split('/');
   res.send(200, tmpPathParts[tmpPathParts.length - 1]);
+});
+
+// RDF output
+app.get('/rdf/event/:id', function(req, res) {
+
+  Event.findOne({_id: req.params.id}, function(error, event) {
+
+    if ( error ) {
+      res.send(404);
+    }
+    else {
+      // Should we specify correct content type (won't open in browser anymore)?
+      // res.setHeader('Content-Type', 'application/x-turtle; charset=utf-8');
+      res.render('event', event);
+    }
+
+  });
+
 });
 
 app.listen(process.argv[2]);
