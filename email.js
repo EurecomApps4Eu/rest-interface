@@ -29,7 +29,7 @@ var email = {
       from: 'Apps4Europe <no-reply@apps4europe.eu>',
       to: to,
       subject: 'New application submitted',
-      body: 'A new application has been submitted.\n\nTodo: embed here direct links to publish app.'
+      body: 'A new application has been submitted.\n\nYou can manage the applications from http://insertWebsiteAddressHere.com.'
     });
   }
 };
