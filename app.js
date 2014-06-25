@@ -69,8 +69,8 @@ app.use(function(req, res, next) {
       }
       else {
         req.body.owner = user._id;
+        next();
       }
-      next();
     });
   }
   else {
@@ -154,10 +154,27 @@ function handleImages(req, res) {
   });
 }
 
-Event.methods(['get', 'post', 'put', 'delete']).register(app, '/events');
+Event.methods([
+  {method: 'get', before: function(req, res, next) {
+    // Only return events belonging to this user
+    if ( req.body.owner ) {
+      req.quer._conditions.owner = req.body.owner;
+    }
+    next();
+  }},
+  'post',
+  'put',
+  'delete'
+]).register(app, '/events');
 
 Application.methods([
-  'get',
+  {method: 'get', before: function(req, res, next) {
+    // Only return applications belonging to this user
+    if ( req.body.owner ) {
+      req.quer._conditions.owner = req.body.owner;
+    }
+    next();
+  }},
   {method: 'post', after: afterPostApplication},
   {method: 'put', after: afterPutApplication},
   'delete'
@@ -306,7 +323,16 @@ app.get('/rdf/event/:id', function(req, res) {
       // Need to escape all properties
       event = turtleEscape(event);
 
-      res.render('event', event);
+      // Find all connected applications
+      Application.find({connectedEvent: req.params.id}, function(error, apps) {
+        if ( error ) {
+          // TODO
+        }
+        else {
+          event.connectedApps = apps;
+          res.render('event', event);
+        }
+      });
     }
 
   });
