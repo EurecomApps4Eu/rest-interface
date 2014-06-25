@@ -7,6 +7,7 @@ var Event = require('./event');
 var applicationSchema = new Schema({
 
     title: String,
+    isAppConceptOnly: Boolean,
     text: String,
     homepage: String,
     downloadUrl: String,
@@ -24,6 +25,12 @@ var applicationSchema = new Schema({
       name: String,
       email: String
     }],
+
+    // Connect application to user account
+    owner: {
+      type: Schema.Types.ObjectId,
+      required: true,
+    }
 
 });
 

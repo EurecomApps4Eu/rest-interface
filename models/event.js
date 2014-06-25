@@ -18,6 +18,7 @@ var eventSchema = new Schema({
       name: String,
       email: String
     }],
+    language: String,
     registrationLink: String,
     theme: String,
     startDate: Date,
