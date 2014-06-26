@@ -13,11 +13,19 @@
 @prefix skos:<http://www.w3.org/2004/02/skos/core#>.
 
 <{{rootUrl}}/rdf/application/{{_id}}>
+  rdf:type odapps:Application;
   dct:title "{{title}}";
-  dct:description """{{description}}""";
+  dct:description """{{text}}""";
   foaf:homepage "{{homepage}}";
   schema:downloadUrl "{{downloadUrl}}";
-  {{#each datasets}}
-    odapps:consumes "{{this.url}}";
+  {{#each datasets}}odapps:consumes "{{this.url}}";
+  {{/each}}
+  apps4x:connectedEvent <{{rootUrl}}/rdf/event/{{connectedEvent}}>;
+  {{#each images}}
+    foaf:depiction <{{this}}>;
+  {{/each}}
+
+  {{#each authors}}
+    dct:creator [foaf:mbox "{{this.name}}"; foaf:name "{{this.email}}"];
   {{/each}}
   .

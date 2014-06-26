@@ -13,8 +13,9 @@
 @prefix skos:<http://www.w3.org/2004/02/skos/core#>.
 
 <{{rootUrl}}/rdf/event/{{_id}}>
+  rdf:type apps4X:Event;
   dct:title "{{title}}";
-  dct:description """{{description}}""";
+  dct:description """{{text}}""";
   schema:startDate "{{startDateF}}"^^xsd:date;
   schema:endDate "{{endDateF}}"^^xsd:date;
   dct:spatial "{{location}}";
@@ -23,4 +24,34 @@
   apps4X:secondPrize "{{secondPrize}}";
   apps4X:thirdPrize "{{thirdPrize}}";
 
+  {{#each firstPrizeWinners}}
+    apps4X:firstPrizeWinner <{{../rootUrl}}/rdf/application/{{this._id}}>;
+  {{/each}}
+  {{#each secondPrizeWinners}}
+    apps4X:secondPrizeWinner <{{../rootUrl}}/rdf/application/{{this._id}}>;
+  {{/each}}
+  {{#each thirdPrizeWinners}}
+    apps4X:thirdPrizeWinner <{{../rootUrl}}/rdf/application/{{this._id}}>;
+  {{/each}}
+
+
+  apps4X:registration "{{registrationLink}}";
+  {{#each connectedApps}}apps4X:connectedApp <{{../rootUrl}}/rdf/application/{{this._id}}>;
+  {{/each}}
+
+  {{#each contacts}}
+    apps4X:contactPerson [foaf:name "{{this.name}}"; foaf:mbox "{{this.email}}"; foaf:phone "{{this.phone}}"];
+  {{/each}}
+
+  {{#each organizers}}
+    apps4X:organizer <{{this.url}}>;
+  {{/each}}
+
+  {{#each sponsors}}
+    apps4X:sponsor <{{this.url}}>;
+  {{/each}}
+
+  {{#each juryMembers}}
+    apps4X:juryMember [foaf:name "{{this.name}}"; foaf:mbox "{{this.email}}"];
+  {{/each}}
   .

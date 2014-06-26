@@ -11,6 +11,8 @@ var extend = require('node.extend');
 var config = require('./config');
 var email = require('./email');
 
+var S = require('string');
+
 // Models
 var Event = require('./models/event');
 var Application = require('./models/application');
@@ -121,32 +123,36 @@ function handleImages(req, res) {
 
   var cleanedImages = [];
 
-  req.body.images.forEach(function(image, key) {
+  if ( req.body.images ) {
 
-    if ( image.src ) {
-      cleanedImages.push(image.src);
-    }
+    req.body.images.forEach(function(image, key) {
 
-    // Image was just uploaded => move from tmp storage to permanent storage
-    else if ( image.tmpName && validImageExtension(image.name) ) {
-      var folder = __dirname + '/static/images/' + id;
-      var newPath = folder + '/' + image.name;
+      if ( image.src ) {
+        cleanedImages.push(image.src);
+      }
 
-      cleanedImages.push(config.restURI + '/static/images/' + id + '/' + image.name);
+      // Image was just uploaded => move from tmp storage to permanent storage
+      else if ( image.tmpName && validImageExtension(image.name) ) {
+        var folder = __dirname + '/static/images/' + id;
+        var newPath = folder + '/' + image.name;
 
-      fs.readFile('/tmp/' + image.tmpName, function (err, data) {
+        cleanedImages.push(config.restURI + '/static/images/' + id + '/' + image.name);
 
-        // Ensure directory exists
-        if ( !fs.existsSync(folder) ) {
-          fs.mkdirSync(folder);
-        }
+        fs.readFile('/tmp/' + image.tmpName, function (err, data) {
 
-        fs.writeFile(newPath, data, function(error) {
-          // TODO: check for error
+          // Ensure directory exists
+          if ( !fs.existsSync(folder) ) {
+            fs.mkdirSync(folder);
+          }
+
+          fs.writeFile(newPath, data, function(error) {
+            // TODO: check for error
+          });
         });
-      });
-    }
-  });
+      }
+    });
+
+  }
 
   Application.findOne({_id:id}, function(err, doc) {
     doc.images = cleanedImages;
@@ -285,6 +291,9 @@ function turtleEscapeSingle(value) {
   }
 
   value = value.replace(/"/g, '\\"');
+
+  // Strip tags
+  value = S(value).stripTags();
 
   return value;
 }
