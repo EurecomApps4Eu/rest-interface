@@ -317,7 +317,7 @@ app.get('/rdf/event/:id', function(req, res) {
 
   Event.findOne({_id: req.params.id}, function(error, event) {
 
-    if ( error ) {
+    if ( error || !event ) {
       res.send(404);
     }
     else {
@@ -352,7 +352,7 @@ app.get('/rdf/application/:id', function(req, res) {
 
   Application.findOne({_id: req.params.id}, function(error, app) {
 
-    if ( error ) {
+    if ( error || !app ) {
       res.send(404);
     }
     else {
