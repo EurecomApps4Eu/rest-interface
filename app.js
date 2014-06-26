@@ -269,13 +269,20 @@ app.get('/users/:id', function(req, res) {
   }
 
   User.findOne({_id: req.params.id}, function(error, dbUser) {
-    var user = {};
 
-    ['_id', 'email', 'emailNotifications'].forEach(function(key) {
-      user[key] = dbUser[key];
-    });
+    if ( error || !dbUser ) {
+      res.send(404);
+    }
 
-    res.json(user);
+    else {
+      var user = {};
+
+      ['_id', 'email', 'emailNotifications'].forEach(function(key) {
+        user[key] = dbUser[key];
+      });
+
+      res.json(user);
+    }
   });
 });
 
