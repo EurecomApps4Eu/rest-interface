@@ -100,6 +100,17 @@ function sendNotification(req, res) {
         return;
       }
 
+      // Need to mark owner as owner also for the application document
+      Application.findOne({_id: res.locals.bundle._id}, function(error, application) {
+        if ( error || !application ) {
+          // TODO: error handling
+        }
+        else {
+          application.owner = event.owner;
+          application.save();
+        }
+      });
+
       User.findOne({_id: event.owner}, function(error, owner) {
         if ( owner && owner.emailNotifications ) {
           email.sendNotification(owner.email);
